@@ -242,54 +242,53 @@ def create_registration_docx(output_path):
     run_mid.font.size = Pt(11)
 
     midterm_rows = [
-        # (STT, Nội dung, Điểm, Phân công, Hạn, is_section_header)
-        ("GIAI ĐOẠN 1: ĐỀ XUẤT ĐỒ ÁN", "", "Tối đa 10 điểm/nhóm", "", "", True),
-        ("1", "Xác định rõ bài toán xử lý tiếng nói cần giải quyết, mục tiêu của hệ thống và kết quả đầu ra mong muốn", "5", "TV1, TV2, TV3", "DONE", False),
-        ("2", "Đồ án có tính thực tiễn, phù hợp với nội dung môn học và có khả năng ứng dụng các kỹ thuật xử lý tiếng nói để giải quyết bài toán", "2", "TV1, TV2, TV3", "DONE", False),
-        ("3", "Xây dựng kế hoạch thực hiện và phân công nhiệm vụ cụ thể cho từng thành viên trong nhóm", "3", "TV1", "DONE", False),
-        ("GIAI ĐOẠN 2: BÁO CÁO VÀ DEMO GIỮA KỲ", "", "Tối đa 40 điểm/sinh viên", "", "", True),
-        ("1. Tổng quan đồ án: 50đ", "", "", "", "", True),
-        ("1.1", "Trình bày rõ bài toán, mục tiêu, dữ liệu đầu vào và kết quả đầu ra của hệ thống", "10", "TV1", "DONE", False),
-        ("1.2", "Khảo sát tối thiểu ý tưởng 03 mô hình, thuật toán hoặc giải pháp liên quan đến đồ án", "10", "TV2", "DONE", False),
-        ("1.3", "Trình bày nguyên lý hoạt động hoặc kiến trúc tổng quát của các mô hình/giải pháp đã khảo sát", "10", "TV3", "DONE", False),
-        ("1.4", "So sánh ưu điểm, nhược điểm và khả năng áp dụng của các mô hình/giải pháp đối với đồ án", "10", "TV2", "DONE", False),
-        ("1.5", "Lựa chọn giải pháp đề xuất cho đồ án và giải thích lý do lựa chọn", "10", "TV1", "DONE", False),
-        ("2. Dữ liệu và đặc trưng tiếng nói: 50đ", "", "Tối đa 20đ/ sinh viên", "", "", True),
-        ("2.1", "Trình bày tổng quan về các dataset sử dụng cho đồ án hoặc phương án thu thập dữ liệu (nếu có)", "10", "TV2", "DONE", False),
-        ("2.2", "Mô tả cấu trúc dữ liệu: số lượng mẫu, nhãn, định dạng file, thời lượng, tần số lấy mẫu và các thuộc tính liên quan", "10", "TV2", "DONE", False),
-        ("2.3", "Trình bày quy trình chuẩn bị dữ liệu: (cắt đoạn, chuẩn hóa âm lượng, khử nhiễu, gán nhãn hoặc chia dữ liệu, v.v...)", "10", "TV3", "DONE", False),
-        ("2.4", "Trích xuất các đặc trưng sử dụng trong đồ án như (waveform, spectrogram, MFCC, LPC, pitch, energy hoặc ZCR, vv...)", "10", "TV1", "DONE", False),
-        ("2.5", "Minh họa và nhận xét dữ liệu/đặc trưng bằng ví dụ cụ thể, hình ảnh hoặc biểu đồ", "10", "TV1", "DONE", False),
-        ("3. Giải pháp cài đặt ban đầu: 40đ", "", "Tối đa 20đ/ sinh viên", "", "", True),
-        ("3.1", "Trình bày kiến trúc hoặc quy trình hoạt động của giải pháp đề xuất", "10", "TV1", "DONE", False),
-        ("3.2", "Cài đặt được mô hình, thuật toán hoặc phương pháp xử lý tiếng nói đã lựa chọn", "10", "TV3", "DONE", False),
-        ("3.3", "Có kết quả thực nghiệm ban đầu hoặc kết quả huấn luyện ban đầu để minh chứng tính khả thi của giải pháp", "10", "TV2", "DONE", False),
-        ("3.4", "Demo được các chức năng cơ bản của hệ thống ở mức giữa kỳ", "10", "TV3", "DONE", False)
+        # (STT, Nội dung, Phân công, Hạn, is_section_header)
+        ("GIAI ĐOẠN 1: ĐỀ XUẤT ĐỒ ÁN", "", "", "", True),
+        ("1", "Xác định rõ bài toán xử lý tiếng nói cần giải quyết, mục tiêu của hệ thống và kết quả đầu ra mong muốn", "TV1, TV2, TV3", "DONE", False),
+        ("2", "Đồ án có tính thực tiễn, phù hợp với nội dung môn học và có khả năng ứng dụng các kỹ thuật xử lý tiếng nói để giải quyết bài toán", "TV1, TV2, TV3", "DONE", False),
+        ("3", "Xây dựng kế hoạch thực hiện và phân công nhiệm vụ cụ thể cho từng thành viên trong nhóm", "TV1", "DONE", False),
+        ("GIAI ĐOẠN 2: BÁO CÁO VÀ DEMO GIỮA KỲ", "", "", "", True),
+        ("1. Tổng quan đồ án", "", "", "", True),
+        ("1.1", "Trình bày rõ bài toán, mục tiêu, dữ liệu đầu vào và kết quả đầu ra của hệ thống", "TV1", "DONE", False),
+        ("1.2", "Khảo sát tối thiểu ý tưởng 03 mô hình, thuật toán hoặc giải pháp liên quan đến đồ án", "TV2", "DONE", False),
+        ("1.3", "Trình bày nguyên lý hoạt động hoặc kiến trúc tổng quát của các mô hình/giải pháp đã khảo sát", "TV3", "DONE", False),
+        ("1.4", "So sánh ưu điểm, nhược điểm và khả năng áp dụng của các mô hình/giải pháp đối với đồ án", "TV2", "DONE", False),
+        ("1.5", "Lựa chọn giải pháp đề xuất cho đồ án và giải thích lý do lựa chọn", "TV1", "DONE", False),
+        ("2. Dữ liệu và đặc trưng tiếng nói", "", "", "", True),
+        ("2.1", "Trình bày tổng quan về các dataset sử dụng cho đồ án hoặc phương án thu thập dữ liệu (nếu có)", "TV2", "DONE", False),
+        ("2.2", "Mô tả cấu trúc dữ liệu: số lượng mẫu, nhãn, định dạng file, thời lượng, tần số lấy mẫu và các thuộc tính liên quan", "TV2", "DONE", False),
+        ("2.3", "Trình bày quy trình chuẩn bị dữ liệu: (cắt đoạn, chuẩn hóa âm lượng, khử nhiễu, gán nhãn hoặc chia dữ liệu, v.v...)", "TV3", "DONE", False),
+        ("2.4", "Trích xuất các đặc trưng sử dụng trong đồ án như (waveform, spectrogram, MFCC, LPC, pitch, energy hoặc ZCR, vv...)", "TV1", "DONE", False),
+        ("2.5", "Minh họa và nhận xét dữ liệu/đặc trưng bằng ví dụ cụ thể, hình ảnh hoặc biểu đồ", "TV1", "DONE", False),
+        ("3. Giải pháp cài đặt ban đầu", "", "", "", True),
+        ("3.1", "Trình bày kiến trúc hoặc quy trình hoạt động của giải pháp đề xuất", "TV1", "DONE", False),
+        ("3.2", "Cài đặt được mô hình, thuật toán hoặc phương pháp xử lý tiếng nói đã lựa chọn", "TV3", "DONE", False),
+        ("3.3", "Có kết quả thực nghiệm ban đầu hoặc kết quả huấn luyện ban đầu để minh chứng tính khả thi của giải pháp", "TV2", "DONE", False),
+        ("3.4", "Demo được các chức năng cơ bản của hệ thống ở mức giữa kỳ", "TV3", "DONE", False)
     ]
 
-    table_mid = doc.add_table(rows=len(midterm_rows) + 1, cols=5)
+    table_mid = doc.add_table(rows=len(midterm_rows) + 1, cols=4)
     table_mid.alignment = WD_TABLE_ALIGNMENT.CENTER
     table_mid.style = 'Table Grid'
-    col_widths_plan = [Inches(0.8), Inches(3.2), Inches(1.3), Inches(0.8), Inches(0.7)]
+    col_widths_plan = [Inches(0.8), Inches(4.2), Inches(1.1), Inches(0.7)]
 
     # Header
     mid_hdr = table_mid.rows[0].cells
-    hdr_titles = ["STT", "NỘI DUNG ĐÁNH GIÁ", "THANG ĐIỂM", "PHÂN CÔNG", "HẠN"]
+    hdr_titles = ["STT", "NỘI DUNG CÔNG VIỆC / ĐÁNH GIÁ", "PHÂN CÔNG", "HẠN"]
     for i, t in enumerate(hdr_titles):
         mid_hdr[i].text = t
         mid_hdr[i].paragraphs[0].runs[0].font.bold = True
         mid_hdr[i].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
         set_cell_background(mid_hdr[i], "D9E1F2")
 
-    for r_idx, (stt, content, score, assign, deadline, is_sec) in enumerate(midterm_rows, start=1):
+    for r_idx, (stt, content, assign, deadline, is_sec) in enumerate(midterm_rows, start=1):
         cells = table_mid.rows[r_idx].cells
         if is_sec:
             # Dòng tiêu đề mục lớn
             cells[0].text = stt
             cells[1].text = content
-            cells[2].text = score
-            cells[3].text = assign
-            cells[4].text = deadline
+            cells[2].text = assign
+            cells[3].text = deadline
             for c in cells:
                 set_cell_background(c, "EAECEE")
                 if len(c.paragraphs[0].runs) > 0:
@@ -298,12 +297,10 @@ def create_registration_docx(output_path):
             cells[0].text = stt
             cells[0].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
             cells[1].text = content
-            cells[2].text = score
+            cells[2].text = assign
             cells[2].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
-            cells[3].text = assign
+            cells[3].text = deadline
             cells[3].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
-            cells[4].text = deadline
-            cells[4].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
 
     for row in table_mid.rows:
         for i, w in enumerate(col_widths_plan):
@@ -319,27 +316,27 @@ def create_registration_docx(output_path):
     run_final.font.size = Pt(11)
 
     final_rows = [
-        ("1. GIẢI PHÁP HOÀN CHỈNH: 60 điểm", "", "Tối đa 20 điểm/sv", "", "", True),
-        ("1.1", "Xây dựng được hệ thống xử lý tiếng nói hoàn chỉnh đúng theo mục tiêu đồ án", "10", "TV3", "03/10/2026", False),
-        ("1.2", "Cài đặt thành công mô hình, thuật toán hoặc phương pháp xử lý tiếng nói đã lựa chọn", "20", "TV3", "03/10/2026", False),
-        ("1.3", "Đề xuất và triển khai cải tiến cho mô hình, thuật toán, module xử lý đặc trưng hoặc kiến trúc hệ thống", "10", "TV1", "03/10/2026", False),
-        ("1.4", "Phân tích được ảnh hưởng của cải tiến đối với hệ thống thông qua kết quả thực nghiệm", "10", "TV1", "03/10/2026", False),
-        ("1.5", "Xây dựng giao diện hoặc chương trình minh họa giúp người dùng nhập dữ liệu âm thanh, chạy hệ thống và quan sát kết quả", "10", "TV2", "03/10/2026", False),
-        ("2. THỰC NGHIỆM VÀ ĐÁNH GIÁ: 60 điểm", "", "Tối đa 20 điểm/sv", "", "", True),
-        ("2.1", "Xây dựng được bộ dữ liệu, tập kiểm thử hoặc kịch bản đánh giá phù hợp với bài toán xử lý tiếng nói", "10", "TV2", "03/10/2026", False),
-        ("2.2", "Thực hiện huấn luyện, kiểm thử hoặc chạy thực nghiệm và thu thập đầy đủ kết quả đánh giá", "20", "TV2", "03/10/2026", False),
-        ("2.3", "Phân tích kết quả dựa trên tiêu chí phù hợp (accuracy, precision, recall, F1-score, WER, CER, loss, confusion matrix hoặc thời gian xử lý, vv...)", "10", "TV3", "03/10/2026", False),
-        ("2.4", "So sánh với mô hình, thuật toán hoặc giải pháp tham chiếu để làm rõ hiệu quả của giải pháp", "10", "TV1", "03/10/2026", False),
-        ("2.5", "Thực hiện đánh giá mở rộng trên dữ liệu khác, giọng nói khác, môi trường nhiều khác hoặc tình huống kiểm thử khác", "10", "TV1", "03/10/2026", False),
-        ("3. FILE BÁO CÁO ĐỒ ÁN: 60 điểm", "", "Tối đa 20 điểm/sv", "", "", True),
-        ("3.1", "Báo cáo đầy đủ các nội dung theo yêu cầu: giới thiệu, cơ sở lý thuyết, dữ liệu, giải pháp đề xuất, thực nghiệm, kết luận và tài liệu tham khảo", "20", "TV1", "03/10/2026", False),
-        ("3.2", "Nội dung báo cáo thể hiện rõ quá trình khảo sát, xây dựng, cài đặt và đánh giá giải pháp xử lý tiếng nói", "10", "TV1", "03/10/2026", False),
-        ("3.3", "Hình ảnh, bảng biểu, sơ đồ hệ thống, thuật toán và kết quả thực nghiệm được trình bày đầy đủ, khoa học và có chú thích rõ ràng", "10", "TV2", "03/10/2026", False),
-        ("3.4", "Trích dẫn và tài liệu tham khảo đầy đủ, đúng quy cách và phù hợp với nội dung đồ án", "10", "TV2", "03/10/2026", False),
-        ("3.5", "Hình thức trình bày báo cáo đúng quy định, bố cục rõ ràng, hạn chế lỗi chính tả và đảm bảo tính học thuật", "10", "TV3", "03/10/2026", False)
+        ("1. GIẢI PHÁP HOÀN CHỈNH", "", "", "", True),
+        ("1.1", "Xây dựng được hệ thống xử lý tiếng nói hoàn chỉnh đúng theo mục tiêu đồ án", "TV2", "03/10/2026", False),
+        ("1.2", "Cài đặt thành công mô hình, thuật toán hoặc phương pháp xử lý tiếng nói đã lựa chọn", "TV3", "03/10/2026", False),
+        ("1.3", "Đề xuất và triển khai cải tiến cho mô hình, thuật toán, module xử lý đặc trưng hoặc kiến trúc hệ thống", "TV1", "03/10/2026", False),
+        ("1.4", "Phân tích được ảnh hưởng của cải tiến đối với hệ thống thông qua kết quả thực nghiệm", "TV1", "03/10/2026", False),
+        ("1.5", "Xây dựng giao diện hoặc chương trình minh họa giúp người dùng nhập dữ liệu âm thanh, chạy hệ thống và quan sát kết quả", "TV2", "03/10/2026", False),
+        ("2. THỰC NGHIỆM VÀ ĐÁNH GIÁ", "", "", "", True),
+        ("2.1", "Xây dựng được bộ dữ liệu, tập kiểm thử hoặc kịch bản đánh giá phù hợp với bài toán xử lý tiếng nói", "TV2", "03/10/2026", False),
+        ("2.2", "Thực hiện huấn luyện, kiểm thử hoặc chạy thực nghiệm và thu thập đầy đủ kết quả đánh giá", "TV3", "03/10/2026", False),
+        ("2.3", "Phân tích kết quả dựa trên tiêu chí phù hợp (accuracy, precision, recall, F1-score, WER, CER, loss, confusion matrix hoặc thời gian xử lý, vv...)", "TV2", "03/10/2026", False),
+        ("2.4", "So sánh với mô hình, thuật toán hoặc giải pháp tham chiếu để làm rõ hiệu quả của giải pháp", "TV1", "03/10/2026", False),
+        ("2.5", "Thực hiện đánh giá mở rộng trên dữ liệu khác, giọng nói khác, môi trường nhiều khác hoặc tình huống kiểm thử khác", "TV1", "03/10/2026", False),
+        ("3. FILE BÁO CÁO ĐỒ ÁN", "", "", "", True),
+        ("3.1", "Báo cáo đầy đủ các nội dung theo yêu cầu: giới thiệu, cơ sở lý thuyết, dữ liệu, giải pháp đề xuất, thực nghiệm, kết luận và tài liệu tham khảo", "TV1", "03/10/2026", False),
+        ("3.2", "Nội dung báo cáo thể hiện rõ quá trình khảo sát, xây dựng, cài đặt và đánh giá giải pháp xử lý tiếng nói", "TV3", "03/10/2026", False),
+        ("3.3", "Hình ảnh, bảng biểu, sơ đồ hệ thống, thuật toán và kết quả thực nghiệm được trình bày đầy đủ, khoa học và có chú thích rõ ràng", "TV2", "03/10/2026", False),
+        ("3.4", "Trích dẫn và tài liệu tham khảo đầy đủ, đúng quy cách và phù hợp với nội dung đồ án", "TV2", "03/10/2026", False),
+        ("3.5", "Hình thức trình bày báo cáo đúng quy định, bố cục rõ ràng, hạn chế lỗi chính tả và đảm bảo tính học thuật", "TV3", "03/10/2026", False)
     ]
 
-    table_final = doc.add_table(rows=len(final_rows) + 1, cols=5)
+    table_final = doc.add_table(rows=len(final_rows) + 1, cols=4)
     table_final.alignment = WD_TABLE_ALIGNMENT.CENTER
     table_final.style = 'Table Grid'
 
@@ -350,14 +347,13 @@ def create_registration_docx(output_path):
         fin_hdr[i].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
         set_cell_background(fin_hdr[i], "FCE4D6")
 
-    for r_idx, (stt, content, score, assign, deadline, is_sec) in enumerate(final_rows, start=1):
+    for r_idx, (stt, content, assign, deadline, is_sec) in enumerate(final_rows, start=1):
         cells = table_final.rows[r_idx].cells
         if is_sec:
             cells[0].text = stt
             cells[1].text = content
-            cells[2].text = score
-            cells[3].text = assign
-            cells[4].text = deadline
+            cells[2].text = assign
+            cells[3].text = deadline
             for c in cells:
                 set_cell_background(c, "EAECEE")
                 if len(c.paragraphs[0].runs) > 0:
@@ -366,12 +362,10 @@ def create_registration_docx(output_path):
             cells[0].text = stt
             cells[0].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
             cells[1].text = content
-            cells[2].text = score
+            cells[2].text = assign
             cells[2].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
-            cells[3].text = assign
+            cells[3].text = deadline
             cells[3].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
-            cells[4].text = deadline
-            cells[4].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
 
     for row in table_final.rows:
         for i, w in enumerate(col_widths_plan):
