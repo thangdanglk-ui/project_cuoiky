@@ -317,23 +317,23 @@ def create_registration_docx(output_path):
 
     final_rows = [
         ("1. GIẢI PHÁP HOÀN CHỈNH", "", "", "", True),
-        ("1.1", "Xây dựng được hệ thống xử lý tiếng nói hoàn chỉnh đúng theo mục tiêu đồ án", "TV2", "03/10/2026", False),
-        ("1.2", "Cài đặt thành công mô hình, thuật toán hoặc phương pháp xử lý tiếng nói đã lựa chọn", "TV3", "03/10/2026", False),
-        ("1.3", "Đề xuất và triển khai cải tiến cho mô hình, thuật toán, module xử lý đặc trưng hoặc kiến trúc hệ thống", "TV1", "03/10/2026", False),
-        ("1.4", "Phân tích được ảnh hưởng của cải tiến đối với hệ thống thông qua kết quả thực nghiệm", "TV1", "03/10/2026", False),
-        ("1.5", "Xây dựng giao diện hoặc chương trình minh họa giúp người dùng nhập dữ liệu âm thanh, chạy hệ thống và quan sát kết quả", "TV2", "03/10/2026", False),
+        ("1.1", "Xây dựng được hệ thống xử lý tiếng nói hoàn chỉnh đúng theo mục tiêu đồ án", "TV2", "29/09/2026", False),
+        ("1.2", "Cài đặt thành công mô hình, thuật toán hoặc phương pháp xử lý tiếng nói đã lựa chọn", "TV3", "29/09/2026", False),
+        ("1.3", "Đề xuất và triển khai cải tiến cho mô hình, thuật toán, module xử lý đặc trưng hoặc kiến trúc hệ thống", "TV1", "29/09/2026", False),
+        ("1.4", "Phân tích được ảnh hưởng của cải tiến đối với hệ thống thông qua kết quả thực nghiệm", "TV1", "29/09/2026", False),
+        ("1.5", "Xây dựng giao diện hoặc chương trình minh họa giúp người dùng nhập dữ liệu âm thanh, chạy hệ thống và quan sát kết quả", "TV2", "29/09/2026", False),
         ("2. THỰC NGHIỆM VÀ ĐÁNH GIÁ", "", "", "", True),
-        ("2.1", "Xây dựng được bộ dữ liệu, tập kiểm thử hoặc kịch bản đánh giá phù hợp với bài toán xử lý tiếng nói", "TV2", "03/10/2026", False),
-        ("2.2", "Thực hiện huấn luyện, kiểm thử hoặc chạy thực nghiệm và thu thập đầy đủ kết quả đánh giá", "TV3", "03/10/2026", False),
-        ("2.3", "Phân tích kết quả dựa trên tiêu chí phù hợp (accuracy, precision, recall, F1-score, WER, CER, loss, confusion matrix hoặc thời gian xử lý, vv...)", "TV2", "03/10/2026", False),
-        ("2.4", "So sánh với mô hình, thuật toán hoặc giải pháp tham chiếu để làm rõ hiệu quả của giải pháp", "TV1", "03/10/2026", False),
-        ("2.5", "Thực hiện đánh giá mở rộng trên dữ liệu khác, giọng nói khác, môi trường nhiều khác hoặc tình huống kiểm thử khác", "TV1", "03/10/2026", False),
+        ("2.1", "Xây dựng được bộ dữ liệu, tập kiểm thử hoặc kịch bản đánh giá phù hợp với bài toán xử lý tiếng nói", "TV2", "29/09/2026", False),
+        ("2.2", "Thực hiện huấn luyện, kiểm thử hoặc chạy thực nghiệm và thu thập đầy đủ kết quả đánh giá", "TV3", "29/09/2026", False),
+        ("2.3", "Phân tích kết quả dựa trên tiêu chí phù hợp (accuracy, precision, recall, F1-score, WER, CER, loss, confusion matrix hoặc thời gian xử lý, vv...)", "TV2", "29/09/2026", False),
+        ("2.4", "So sánh với mô hình, thuật toán hoặc giải pháp tham chiếu để làm rõ hiệu quả của giải pháp", "TV1", "29/09/2026", False),
+        ("2.5", "Thực hiện đánh giá mở rộng trên dữ liệu khác, giọng nói khác, môi trường nhiều khác hoặc tình huống kiểm thử khác", "TV1", "29/09/2026", False),
         ("3. FILE BÁO CÁO ĐỒ ÁN", "", "", "", True),
-        ("3.1", "Báo cáo đầy đủ các nội dung theo yêu cầu: giới thiệu, cơ sở lý thuyết, dữ liệu, giải pháp đề xuất, thực nghiệm, kết luận và tài liệu tham khảo", "TV1", "03/10/2026", False),
-        ("3.2", "Nội dung báo cáo thể hiện rõ quá trình khảo sát, xây dựng, cài đặt và đánh giá giải pháp xử lý tiếng nói", "TV3", "03/10/2026", False),
-        ("3.3", "Hình ảnh, bảng biểu, sơ đồ hệ thống, thuật toán và kết quả thực nghiệm được trình bày đầy đủ, khoa học và có chú thích rõ ràng", "TV2", "03/10/2026", False),
-        ("3.4", "Trích dẫn và tài liệu tham khảo đầy đủ, đúng quy cách và phù hợp với nội dung đồ án", "TV2", "03/10/2026", False),
-        ("3.5", "Hình thức trình bày báo cáo đúng quy định, bố cục rõ ràng, hạn chế lỗi chính tả và đảm bảo tính học thuật", "TV3", "03/10/2026", False)
+        ("3.1", "Báo cáo đầy đủ các nội dung theo yêu cầu: giới thiệu, cơ sở lý thuyết, dữ liệu, giải pháp đề xuất, thực nghiệm, kết luận và tài liệu tham khảo", "TV1", "29/09/2026", False),
+        ("3.2", "Nội dung báo cáo thể hiện rõ quá trình khảo sát, xây dựng, cài đặt và đánh giá giải pháp xử lý tiếng nói", "TV3", "29/09/2026", False),
+        ("3.3", "Hình ảnh, bảng biểu, sơ đồ hệ thống, thuật toán và kết quả thực nghiệm được trình bày đầy đủ, khoa học và có chú thích rõ ràng", "TV2", "29/09/2026", False),
+        ("3.4", "Trích dẫn và tài liệu tham khảo đầy đủ, đúng quy cách và phù hợp với nội dung đồ án", "TV2", "29/09/2026", False),
+        ("3.5", "Hình thức trình bày báo cáo đúng quy định, bố cục rõ ràng, hạn chế lỗi chính tả và đảm bảo tính học thuật", "TV3", "29/09/2026", False)
     ]
 
     table_final = doc.add_table(rows=len(final_rows) + 1, cols=4)
