@@ -36,7 +36,6 @@ env/
 *.swp
 *.swo
 
-# Excluded by user request (dataset will be pushed later)
+# Excluded by user request
 docs/
 README.md
-dataset/
