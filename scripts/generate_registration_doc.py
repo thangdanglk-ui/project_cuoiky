@@ -322,18 +322,21 @@ def create_registration_docx(output_path):
         ("1.3", "Đề xuất và triển khai cải tiến cho mô hình, thuật toán, module xử lý đặc trưng hoặc kiến trúc hệ thống", "TV1", "29/09/2026", False),
         ("1.4", "Phân tích được ảnh hưởng của cải tiến đối với hệ thống thông qua kết quả thực nghiệm", "TV1", "29/09/2026", False),
         ("1.5", "Xây dựng giao diện hoặc chương trình minh họa giúp người dùng nhập dữ liệu âm thanh, chạy hệ thống và quan sát kết quả", "TV2", "29/09/2026", False),
+        ("1.6", "Tối ưu hóa mã nguồn, đóng gói pipeline xử lý âm thanh thời gian thực và kiểm thử tính ổn định của hệ thống", "TV3", "29/09/2026", False),
         ("2. THỰC NGHIỆM VÀ ĐÁNH GIÁ", "", "", "", True),
         ("2.1", "Xây dựng được bộ dữ liệu, tập kiểm thử hoặc kịch bản đánh giá phù hợp với bài toán xử lý tiếng nói", "TV2", "29/09/2026", False),
         ("2.2", "Thực hiện huấn luyện, kiểm thử hoặc chạy thực nghiệm và thu thập đầy đủ kết quả đánh giá", "TV3", "29/09/2026", False),
         ("2.3", "Phân tích kết quả dựa trên tiêu chí phù hợp (accuracy, precision, recall, F1-score, WER, CER, loss, confusion matrix hoặc thời gian xử lý, vv...)", "TV2", "29/09/2026", False),
         ("2.4", "So sánh với mô hình, thuật toán hoặc giải pháp tham chiếu để làm rõ hiệu quả của giải pháp", "TV1", "29/09/2026", False),
         ("2.5", "Thực hiện đánh giá mở rộng trên dữ liệu khác, giọng nói khác, môi trường nhiều khác hoặc tình huống kiểm thử khác", "TV1", "29/09/2026", False),
+        ("2.6", "Đo đạc và phân tích chi tiết độ trễ xử lý (latency), tốc độ suy luận (Realtime Factor) và mức độ sử dụng tài nguyên hệ thống", "TV3", "29/09/2026", False),
         ("3. FILE BÁO CÁO ĐỒ ÁN", "", "", "", True),
         ("3.1", "Báo cáo đầy đủ các nội dung theo yêu cầu: giới thiệu, cơ sở lý thuyết, dữ liệu, giải pháp đề xuất, thực nghiệm, kết luận và tài liệu tham khảo", "TV1", "29/09/2026", False),
         ("3.2", "Nội dung báo cáo thể hiện rõ quá trình khảo sát, xây dựng, cài đặt và đánh giá giải pháp xử lý tiếng nói", "TV3", "29/09/2026", False),
         ("3.3", "Hình ảnh, bảng biểu, sơ đồ hệ thống, thuật toán và kết quả thực nghiệm được trình bày đầy đủ, khoa học và có chú thích rõ ràng", "TV2", "29/09/2026", False),
         ("3.4", "Trích dẫn và tài liệu tham khảo đầy đủ, đúng quy cách và phù hợp với nội dung đồ án", "TV2", "29/09/2026", False),
-        ("3.5", "Hình thức trình bày báo cáo đúng quy định, bố cục rõ ràng, hạn chế lỗi chính tả và đảm bảo tính học thuật", "TV3", "29/09/2026", False)
+        ("3.5", "Hình thức trình bày báo cáo đúng quy định, bố cục rõ ràng, hạn chế lỗi chính tả và đảm bảo tính học thuật", "TV3", "29/09/2026", False),
+        ("3.6", "Rà soát, hoàn thiện toàn bộ nội dung báo cáo, biên soạn tài liệu tóm tắt và xây dựng slide thuyết trình bảo vệ đồ án", "TV1", "29/09/2026", False)
     ]
 
     table_final = doc.add_table(rows=len(final_rows) + 1, cols=4)
@@ -377,14 +380,23 @@ def create_registration_docx(output_path):
     print(f"[OK] Đã tạo thành công file Word tại: {output_path}")
 
 if __name__ == "__main__":
+    # 1. Thư mục Documents\ASR
+    asr_dir = r"C:\Users\Admin\Documents\ASR"
+    os.makedirs(asr_dir, exist_ok=True)
+    asr_file = os.path.join(asr_dir, "NHÓM 6 - PHIẾU ĐĂNG KÝ ĐỒ ÁN MÔN XỬ LÝ TIẾNG NÓI.docx")
+    create_registration_docx(asr_file)
+
+    # 2. Thư mục Downloads
     out_dir = r"C:\Users\Admin\Downloads"
+    os.makedirs(out_dir, exist_ok=True)
     out_file1 = os.path.join(out_dir, "NHÓM 6 - PHIẾU ĐĂNG KÝ ĐỒ ÁN MÔN XỬ LÝ TIẾNG NÓI.docx")
     out_file2 = os.path.join(out_dir, "PHIEU_DANG_KY_DO_AN_MON_XU_LY_TIENG_NOI.docx")
     create_registration_docx(out_file1)
     create_registration_docx(out_file2)
 
-    # Đồng bộ vào docs của project
+    # 3. Thư mục docs của project
     project_docs = r"C:\Users\Admin\PycharmProjects\speech-processing-tutorial\project_cuoiky\docs"
+    os.makedirs(project_docs, exist_ok=True)
     p_file1 = os.path.join(project_docs, "NHÓM 6 - PHIẾU ĐĂNG KÝ ĐỒ ÁN MÔN XỬ LÝ TIẾNG NÓI.docx")
     p_file2 = os.path.join(project_docs, "PHIEU_DANG_KY_DO_AN_MON_XU_LY_TIENG_NOI.docx")
     create_registration_docx(p_file1)

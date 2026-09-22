@@ -459,6 +459,60 @@ class AudioEngine:
             "vad_mask": vad_mask
         }
 
+    def apply_vad_trimming(self, audio_np, vad_threshold=0.08, padding_ms=200):
+        """
+        Cắt gọt khoảng lặng (Silence Trimming) dựa trên Năng lượng ngắn hạn (STE):
+        - Tìm ranh giới bắt đầu (onset) và kết thúc (offset) của vùng có tiếng nói.
+        - Dự trữ padding_ms (mặc định 200ms) ở hai đầu để bảo toàn âm đầu/đuôi.
+        - Trả về mảng âm thanh đã cắt gọt, hoặc None nếu toàn bộ tín hiệu là khoảng lặng/tiếng ồn.
+        """
+        if audio_np is None or len(audio_np) == 0:
+            return None
+
+        sr = self.target_samplerate
+        frame_len = int(0.025 * sr)  # 400 mẫu (25ms)
+        hop_len = int(0.010 * sr)    # 160 mẫu (10ms)
+
+        if len(audio_np) < frame_len:
+            return audio_np
+
+        # Kiểm tra sàn năng lượng: Nếu toàn bộ tín hiệu chỉ là tiếng ồn nền cực nhỏ
+        max_amp = float(np.max(np.abs(audio_np)))
+        if max_amp < 0.005:
+            print(f"[VAD] Tín hiệu quá nhỏ (Biên độ đỉnh {max_amp:.5f} < 0.005) -> Xác định là khoảng lặng.")
+            return None
+
+        window = np.hamming(frame_len)
+        num_frames = 1 + int((len(audio_np) - frame_len) / hop_len)
+        ste = np.zeros(num_frames)
+
+        for i in range(num_frames):
+            start = i * hop_len
+            frame = audio_np[start:start + frame_len] * window
+            ste[i] = np.sum(frame ** 2)
+
+        max_ste = np.max(ste) if np.max(ste) > 0 else 1.0
+        ste_norm = ste / max_ste
+        vad_mask = ste_norm >= vad_threshold
+
+        active_indices = np.where(vad_mask)[0]
+        if len(active_indices) == 0:
+            print("[VAD] Không phát hiện tiếng nói (Toàn bộ dưới ngưỡng 0.08) -> Bỏ qua nhận dạng.")
+            return None
+
+        start_frame = active_indices[0]
+        end_frame = active_indices[-1]
+
+        padding_samples = int((padding_ms / 1000.0) * sr)
+        start_sample = max(0, start_frame * hop_len - padding_samples)
+        end_sample = min(len(audio_np), end_frame * hop_len + frame_len + padding_samples)
+
+        trimmed_audio = audio_np[start_sample:end_sample]
+        orig_dur = len(audio_np) / sr
+        trim_dur = len(trimmed_audio) / sr
+        print(f"[VAD] Đã kích hoạt màng lọc: Cắt từ {orig_dur:.2f}s -> {trim_dur:.2f}s (Đã gọt bỏ {orig_dur - trim_dur:.2f}s im lặng).")
+        return trimmed_audio
+
     def set_asr_engine(self, engine_name):
         """Thay đổi động cơ ASR: 'crnn', 'wav2vec2', hoặc 'both'."""
         if hasattr(self, 'ctc_recognizer') and self.ctc_recognizer is not None:
@@ -558,7 +612,17 @@ class AudioEngine:
         if not self.is_model_ready():
             return "[Lỗi] Mô hình AI chưa sẵn sàng!"
 
-        return self.ctc_recognizer.recognize(audio_np, sr=self.target_samplerate, engine=engine)
+        # Màng lọc VAD: Cắt gọt khoảng lặng & loại bỏ tạp âm nền
+        if use_vad:
+            trimmed_audio = self.apply_vad_trimming(audio_np, vad_threshold=0.08, padding_ms=200)
+            if trimmed_audio is None:
+                # Toàn bộ đoạn âm thanh chỉ là khoảng lặng hoặc tiếng ồn dưới ngưỡng VAD
+                return ""
+            audio_to_recognize = trimmed_audio
+        else:
+            audio_to_recognize = audio_np
+
+        return self.ctc_recognizer.recognize(audio_to_recognize, sr=self.target_samplerate, engine=engine)
 
     # ---------------- PHÁT TIẾNG NÓI (TEXT TO SPEECH) ----------------
     def text_to_speech(self, text, lang="vi", on_complete=None):
