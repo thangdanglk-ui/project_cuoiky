@@ -22,8 +22,9 @@ from models.crnn_model import SpeechCRNN_CTC
 from models.feature_extractor import VIVOSDataset, ctc_collate_fn
 from models.ctc_decoder import CTCGreedyDecoder
 
-def train_ctc(epochs=30, batch_size=16, lr=1e-4, max_train_samples=3000, device="cpu", resume=True, max_hours=2.0):
-    # Điều tiết CPU hợp lý để máy không bị treo/quá nhiệt khi chạy dài 2 tiếng
+def train_ctc(epochs=30, batch_size=16, lr=1e-4, max_train_samples=3000, device=None, resume=True, max_hours=2.0):
+    if device is None:
+        device = "cuda" if torch.cuda.is_available() else "cpu"
     if device == "cpu":
         torch.set_num_threads(2)
 
@@ -261,6 +262,7 @@ if __name__ == "__main__":
     parser.add_argument("--samples", type=int, default=1500, help="Số mẫu huấn luyện tối đa")
     parser.add_argument("--lr", type=float, default=1e-4, help="Learning rate (nhỏ cho fine-tuning)")
     parser.add_argument("--hours", type=float, default=2.0, help="Thời gian chạy tối đa (giờ)")
+    parser.add_argument("--device", type=str, default=None, help="Thiết bị huấn luyện: cuda hoặc cpu")
     parser.add_argument("--no_resume", action="store_true", help="Không nạp lại checkpoint cũ mà train từ đầu")
     args = parser.parse_args()
 
@@ -269,6 +271,7 @@ if __name__ == "__main__":
         batch_size=args.batch_size,
         lr=args.lr,
         max_train_samples=args.samples if args.samples > 0 else None,
+        device=args.device,
         resume=not args.no_resume,
         max_hours=args.hours
     )

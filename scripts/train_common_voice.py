@@ -22,9 +22,11 @@ from models.crnn_model import SpeechCRNN_CTC
 from models.feature_extractor import CommonVoiceDataset, VIVOSDataset, ctc_collate_fn
 from models.ctc_decoder import CTCGreedyDecoder
 
-def train_common_voice(epochs=1, batch_size=16, lr=5e-5, mix_vivos=True, max_hours=0.5):
-    torch.set_num_threads(2)
-    device = "cpu"
+def train_common_voice(epochs=1, batch_size=16, lr=5e-5, mix_vivos=True, max_hours=0.5, device=None):
+    if device is None:
+        device = "cuda" if torch.cuda.is_available() else "cpu"
+    if device == "cpu":
+        torch.set_num_threads(2)
     device_obj = torch.device(device)
 
     weights_dir = os.path.join(BASE_DIR, "models", "weights")
@@ -181,6 +183,7 @@ if __name__ == "__main__":
     parser.add_argument("--batch_size", type=int, default=16, help="Kích thước batch")
     parser.add_argument("--lr", type=float, default=5e-5, help="Learning rate nhỏ cho fine-tuning")
     parser.add_argument("--hours", type=float, default=0.5, help="Thời gian tối đa (giờ)")
+    parser.add_argument("--device", type=str, default=None, help="Thiết bị huấn luyện: cuda hoặc cpu")
     parser.add_argument("--no_mix", action="store_true", help="Không trộn VIVOS")
     args = parser.parse_args()
 
@@ -189,5 +192,6 @@ if __name__ == "__main__":
         batch_size=args.batch_size,
         lr=args.lr,
         mix_vivos=not args.no_mix,
-        max_hours=args.hours
+        max_hours=args.hours,
+        device=args.device
     )
