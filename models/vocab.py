@@ -9,20 +9,28 @@ if sys.platform == "win32":
     except Exception:
         pass
 
-# Danh sách đầy đủ bảng chữ cái tiếng Việt cho bài toán CTC ASR
-# Token 0 LUÔN LUÔN là <blank> theo chuẩn PyTorch CTCLoss
+# =============================================================================
+# [MỤC 2.2 - TV1: TRẦN ĐĂNG THẮNG]
+# BẢNG TỪ VỰNG KÝ TỰ TIẾNG VIỆT TOÀN DIỆN CHO CTC ASR (CHARACTER-LEVEL VOCAB)
+# - Index 0: <blank> (Token khoảng trống bắt buộc của PyTorch CTCLoss)
+# - Index 1: ' ' (Khoảng trắng giữa các từ)
+# - Index 2-27: 26 chữ cái Latin cơ bản (a-z)
+# - Index 28: Chữ cái 'đ'
+# - Index 29-74: 46 nguyên âm có dấu thanh điệu tiếng Việt chuẩn Unicode NFC
+# Tránh lỗi OOV (Out-Of-Vocabulary) khi người dùng nói từ mới hoặc từ mượn!
+# =============================================================================
 BLANK_TOKEN = "<blank>"
 SPACE_TOKEN = " "
 
 BASE_CHARS = [
-    BLANK_TOKEN,
-    SPACE_TOKEN,
+    BLANK_TOKEN,  # [MỤC 2.2 - TV1] Index 0: Bắt buộc cho Blank token CTC
+    SPACE_TOKEN,  # [MỤC 2.2 - TV1] Index 1: Phân tách từ
     # Chữ cái Latin cơ bản
     'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm',
     'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
     # Chữ đ
     'đ',
-    # Nguyên âm có dấu tiếng Việt
+    # [MỤC 2.2 - TV1] Toàn bộ nguyên âm có dấu thanh tiếng Việt:
     'à', 'á', 'ả', 'ã', 'ạ',
     'ă', 'ằ', 'ắ', 'ẳ', 'ẵ', 'ặ',
     'â', 'ầ', 'ấ', 'ẩ', 'ẫ', 'ậ',
@@ -35,11 +43,14 @@ BASE_CHARS = [
     'ù', 'ú', 'ủ', 'ũ', 'ụ',
     'ư', 'ừ', 'ứ', 'ử', 'ữ', 'ự',
     'ỳ', 'ý', 'ỷ', 'ỹ', 'ỵ',
-    # Chữ số nếu có
+    # Chữ số
     '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'
 ]
 
 class VietnameseVocab:
+    """
+    [MỤC 2.2 - TV1] Bộ Tokenizer hai chiều Văn bản <-> Chỉ số số học cho mô hình CRNN-CTC.
+    """
     def __init__(self, char_list=None):
         if char_list is None:
             self.chars = list(BASE_CHARS)
@@ -59,7 +70,7 @@ class VietnameseVocab:
         return len(self.chars)
 
     def text_to_indices(self, text):
-        """Chuyển chuỗi văn bản thành danh sách chỉ số (indices)."""
+        """[MỤC 2.2 - TV1] Mã hóa chuỗi văn bản thành danh sách chỉ số (indices)."""
         text = text.strip().lower()
         indices = []
         for char in text:
@@ -71,7 +82,7 @@ class VietnameseVocab:
         return indices
 
     def indices_to_text(self, indices):
-        """Chuyển danh sách chỉ số thành chuỗi văn bản."""
+        """[MỤC 2.2 - TV1] Giải mã danh sách chỉ số thành chuỗi văn bản tiếng Việt."""
         chars = []
         for idx in indices:
             if idx in self.idx2char:

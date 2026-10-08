@@ -17,7 +17,14 @@ except ImportError:
     from asr_controller import CTCSpeechRecognizer
 
 
-# Các chế độ đầu vào âm thanh chuẩn đồ án ASR
+# =============================================================================
+# [MỤC 1.1 - TV1: TRẦN ĐĂNG THẮNG]
+# THIẾT LẬP DỮ LIỆU ĐẦU VÀO (INPUT) HỆ THỐNG ASR:
+# - Hỗ trợ 3 chế độ thu âm: Mic Laptop, Tai nghe (Headset), File âm thanh (.wav)
+# - Tần số lấy mẫu chuẩn: 16.000 Hz (định lý Nyquist-Shannon bao phủ Formant F1-F5 < 8kHz)
+# - Số kênh: 1 kênh Mono (loại bỏ lệch pha stereo, giảm 50% tính toán)
+# - Định dạng: 16-bit Linear PCM, chuẩn hóa float32 trong khoảng [-1.0, 1.0]
+# =============================================================================
 MODE_LAPTOP_MIC = "Nói trực tiếp vào Laptop"
 MODE_HEADSET_MIC = "Nói qua tai phone (Tai nghe)"
 MODE_FILE = "Chọn File âm thanh (.wav)"
@@ -38,13 +45,13 @@ class AudioEngine:
         self.on_model_status_change = on_model_status_change
         self.model_status = "Đang nạp mô hình AI Tự Huấn Luyện (SpeechCRNN + CTC)..."
 
-        # Audio stream variables
+        # [MỤC 1.1 - TV1] Cấu hình thông số luồng âm thanh đầu vào chuẩn đồ án:
         self.is_recording = False
         self.audio_queue = queue.Queue()
         self.audio_frames = []
-        self.target_samplerate = 16000
-        self.record_samplerate = 16000
-        self.record_channels = 1
+        self.target_samplerate = 16000  # 16.000 Hz
+        self.record_samplerate = 16000  # Tần số phần cứng thực tế
+        self.record_channels = 1        # 1 kênh Mono
         self.stream = None
         self.active_device_index = None
 
@@ -116,7 +123,7 @@ class AudioEngine:
         for idx, d in safe_devices:
             name = d['name'].strip()
             name_lower = name.lower()
-
+    
             # 1. Âm thanh hệ thống / Stereo Mix
             if 'stereo mix' in name_lower or 'what u hear' in name_lower or 'wave out' in name_lower:
                 if stereo_mix is None:
@@ -354,7 +361,8 @@ class AudioEngine:
         if len(audio_data) == 0:
             return None
 
-        # Chuyển đổi nhiều kênh (Stereo) sang Mono nếu cần
+        # [MỤC 1.1 - TV1] Chuyển đổi nhiều kênh (Stereo) sang Mono:
+        # Loại bỏ lệch pha giữa 2 kênh, giảm 50% chi phí tính toán cho mạng nơ-ron
         if self.record_channels > 1:
             total_samples = len(audio_data) - (len(audio_data) % self.record_channels)
             audio_reshaped = audio_data[:total_samples].reshape(-1, self.record_channels)
@@ -368,10 +376,11 @@ class AudioEngine:
         else:
             audio_mono = audio_data
 
-        # Chuẩn hoá sang float32 phạm vi [-1.0, 1.0]
+        # [MỤC 1.1 - TV1] Chuẩn hóa mảng 16-bit PCM (int16: -32768..32767) sang float32 [-1.0, 1.0]
         audio_float = audio_mono.astype(np.float32) / 32768.0
 
-        # Resample về 16000Hz nếu phần cứng thu ở 44100Hz hoặc 48000Hz
+        # [MỤC 1.1 - TV1] Tự động hạ tần số về chuẩn 16.000 Hz bằng Polyphase Filter
+        # (scipy.signal.resample_poly) tích hợp bộ lọc FIR chống chồng phổ (Anti-aliasing)
         if self.record_samplerate != self.target_samplerate:
             try:
                 audio_float = signal.resample_poly(
@@ -461,10 +470,14 @@ class AudioEngine:
 
     def apply_vad_trimming(self, audio_np, vad_threshold=0.08, padding_ms=200):
         """
-        Cắt gọt khoảng lặng (Silence Trimming) dựa trên Năng lượng ngắn hạn (STE):
-        - Tìm ranh giới bắt đầu (onset) và kết thúc (offset) của vùng có tiếng nói.
-        - Dự trữ padding_ms (mặc định 200ms) ở hai đầu để bảo toàn âm đầu/đuôi.
-        - Trả về mảng âm thanh đã cắt gọt, hoặc None nếu toàn bộ tín hiệu là khoảng lặng/tiếng ồn.
+        =============================================================================
+        [MỤC 2.4 & MỤC 1.1 - TV1: TRẦN ĐĂNG THẮNG]
+        PHÁT HIỆN HOẠT TÍNH GIỌNG NÓI (VOICE ACTIVITY DETECTION - VAD)
+        - Dựa trên Năng lượng ngắn hạn (Short-Time Energy - STE) và Cửa sổ Hamming:
+          E_m = sum_{n=0}^{N-1} (x[m*H + n] * w[n])^2
+        - Tự động cắt bỏ các đoạn im lặng ở đầu và cuối (Silence Trimming)
+        - Giúp tiết kiệm tài nguyên tính toán và chống nhận dạng nhiễu nền thành ký tự rác
+        =============================================================================
         """
         if audio_np is None or len(audio_np) == 0:
             return None
@@ -521,8 +534,13 @@ class AudioEngine:
 
     def load_audio_file(self, file_path):
         """
-        Nạp file âm thanh từ đĩa (.wav, .flac, .ogg, .mp3...),
-        chuyển đổi về mono và tần số 16000Hz chuẩn đồ án.
+        =============================================================================
+        [MỤC 1.1 - TV1: TRẦN ĐĂNG THẮNG]
+        NẠP FILE ÂM THANH ĐẦU VÀO (.WAV):
+        - Chuyển đổi về 1 kênh Mono: x_mono = mean(x, axis=1)
+        - Chuẩn hóa tần số lấy mẫu về chuẩn 16.000 Hz bằng resample_poly
+        - Chuẩn hóa biên độ đỉnh (Peak Normalization): (data / max_amp) * 0.95
+        =============================================================================
         """
         import soundfile as sf
         import scipy.signal as signal
@@ -536,7 +554,7 @@ class AudioEngine:
             # Tái lấy mẫu về 16000 Hz
             data = signal.resample_poly(data, self.target_samplerate, sr).astype(np.float32)
 
-        # Chuẩn hóa biên độ
+        # [MỤC 1.1 - TV1] Chuẩn hóa biên độ đỉnh về 0.95 chống clipping méo tiếng
         max_amp = float(np.max(np.abs(data)))
         if max_amp > 0:
             data = (data / max_amp) * 0.95

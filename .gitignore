@@ -39,3 +39,7 @@ env/
 # Excluded by user request
 docs/
 README.md
+scratch/
+*.parquet
+models/weights/*baseline*.pth
+models/weights/*epoch*.pth

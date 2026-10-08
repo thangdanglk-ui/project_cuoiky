@@ -197,18 +197,36 @@ class CTCSpeechRecognizer:
             return f"[Lỗi Wav2Vec2]: {e}"
 
     def _recognize_crnn(self, audio_np, sr=16000):
-        """Nhận diện bằng mạng CRNN-CTC VIVOS đồ án (Tự xây dựng from-scratch)."""
+        """
+        =============================================================================
+        [MỤC 3.1 & MỤC 1.1 - TV1: TRẦN ĐĂNG THẮNG]
+        QUY TRÌNH SUY LUẬN TOÀN DIỆN CỦA PIPELINE CRNN-CTC:
+        1. Chuẩn hóa âm lượng: norm_audio = (audio / max_amp) * 0.95
+        2. Trích xuất đặc trưng: 80 dải Log-Mel Spectrogram & CMVN
+        3. Lan truyền mô hình: mel_tensor -> SpeechCRNN_CTC -> log_probs (Time', Vocab)
+        4. Thu nhỏ độ dài chuỗi: out_lens = get_output_lengths (T' = T // 4)
+        5. Giải mã CTC Greedy + Hậu xử lý Unicode NFKD & Lexicon tiếng Việt
+        =============================================================================
+        """
         try:
+            # 1. Peak Normalization
             max_amp = float(np.max(np.abs(audio_np)))
             norm_audio = (audio_np / max_amp) * 0.95
+
+            # 2. [MỤC 2.4 - TV1] Trích xuất 80 Log-Mel Spectrogram
             mel = self.extractor.extract(norm_audio)
             mel_tensor = mel.unsqueeze(0).unsqueeze(0).to(self.device)
+
+            # 3. [MỤC 3.1 - TV1] Lan truyền qua mạng CRNN-CTC
             with torch.no_grad():
                 log_probs = self.crnn_model(mel_tensor)
                 out_lens = self.crnn_model.get_output_lengths(torch.tensor([mel.size(1)]))
+
+                # 4. [MỤC 3.1 - TV1] Giải mã CTC Greedy và Ràng buộc từ điển tiếng Việt
                 raw_chars = self.crnn_decoder.decode_single(log_probs[0, :out_lens[0]], refine=False)
                 pred_text = self.crnn_decoder.decode_single(log_probs[0, :out_lens[0]], refine=True)
 
+            # 5. [MỤC 1.1 - TV1] Xuất chuỗi văn bản tiếng Việt có dấu
             if pred_text.strip():
                 return pred_text.strip().capitalize()
             elif raw_chars.strip():

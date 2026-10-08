@@ -95,8 +95,13 @@ class VietnameseLanguagePostProcessor:
 
 class CTCGreedyDecoder:
     """
-    Bộ giải mã tham lam CTC (CTC Greedy Decoder - Best Path Decoding)
-    kết hợp Bộ hậu xử lý Ngôn ngữ Tiếng Việt (Vietnamese Lexicon Constraint).
+    =============================================================================
+    [MỤC 3.1 & MỤC 1.5 - TV1: TRẦN ĐĂNG THẮNG]
+    BỘ GIẢI MÃ THAM LAM CTC (CTC GREEDY BEST-PATH DECODER)
+    - Chọn nhãn xác suất cực đại tại từng timestep: pi_t = argmax P(c | x_t)
+    - Phép co đường dẫn CTC B: Gộp các ký tự lặp liên tiếp và loại bỏ token Blank <blank>
+    - Hậu xử lý Unicode NFKD & Ràng buộc từ điển tiếng Việt (Vietnamese Lexicon Constraint)
+    =============================================================================
     """
     def __init__(self, vocab, blank_penalty=-1.5, use_language_model=True):
         self.vocab = vocab
@@ -106,12 +111,13 @@ class CTCGreedyDecoder:
 
     def decode_single(self, log_probs, blank_penalty=None, refine=True):
         """
-        Giải mã 1 chuỗi âm thanh thành câu văn bản hoàn chỉnh.
-        log_probs: Tensor kích thước (Time, Vocab_size)
+        [MỤC 3.1 - TV1] Giải mã 1 chuỗi âm thanh thành câu văn bản hoàn chỉnh.
+        log_probs: Tensor kích thước (Time, Vocab_size=75)
         """
         if blank_penalty is None:
             blank_penalty = self.blank_penalty
 
+        # [MỤC 3.1 - TV1] Bước 1: Greedy Argmax tại từng timestep t
         if isinstance(log_probs, torch.Tensor):
             if blank_penalty != 0:
                 adjusted = log_probs.clone()
@@ -122,6 +128,7 @@ class CTCGreedyDecoder:
         else:
             best_ids = list(log_probs)
 
+        # [MỤC 3.1 - TV1] Bước 2: Phép co CTC B(pi) - Gộp lặp liên tiếp và xóa Blank
         collapsed = []
         prev = None
         for token_id in best_ids:
@@ -130,10 +137,11 @@ class CTCGreedyDecoder:
                     collapsed.append(token_id)
                 prev = token_id
 
+        # [MỤC 3.1 - TV1] Bước 3: Ánh xạ chỉ số thành chuỗi ký tự tiếng Việt
         text = self.vocab.indices_to_text(collapsed)
         text = " ".join(text.split())
 
-        # Hậu xử lý ghép từ ngữ tiếng Việt có nghĩa
+        # [MỤC 1.5 & MỤC 3.1 - TV1] Bước 4: Hậu xử lý Lexicon sửa lỗi chính tả phụ âm ghép và dấu thanh
         if refine and self.post_processor is not None and text:
             refined_text = self.post_processor.refine(text)
             if refined_text:

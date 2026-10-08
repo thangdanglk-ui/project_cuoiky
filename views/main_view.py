@@ -68,7 +68,7 @@ class SpeechAIGUI(ctk.CTk):
         )
         self.lbl_title.pack(pady=(10, 2))
 
-        theory_banner = "Pipeline: Sóng âm -> Lấy mẫu (16kHz) -> Lọc VAD -> Đặc trưng MFCC -> Mạng nơ-ron CRNN -> gTTS"
+        theory_banner = "Pipeline: Sóng âm (16kHz) -> Lọc VAD -> 80 dải Log-Mel Spectrogram -> Mạng CRNN-CTC -> Văn bản tiếng Việt"
         self.lbl_theory = ctk.CTkLabel(
             self,
             text=theory_banner,

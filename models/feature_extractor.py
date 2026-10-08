@@ -16,30 +16,41 @@ if sys.platform == "win32":
 
 class MelFeatureExtractor:
     """
-    Bộ trích xuất đặc trưng Log Mel-Spectrogram thuần PyTorch & Cửa sổ Hamming (Slide 01c)
-    Tốc độ xử lý cực nhanh trực tiếp trên Tensor.
+    =============================================================================
+    [MỤC 2.4 - TV1: TRẦN ĐĂNG THẮNG]
+    TRÍCH XUẤT ĐẶC TRƯNG 80 DẢI LOG-MEL SPECTROGRAM & CỬA SỔ HAMMING (Slide 2b)
+    - Bước 1: Phân khung (25ms = 400 mẫu, hop 10ms = 160 mẫu) & Cửa sổ Hamming
+    - Bước 2: STFT 512 điểm tính phổ công suất Power Spectrum |STFT|^2
+    - Bước 3: Ngân hàng 80 bộ lọc tam giác Mel Filterbank & Thang đo Logarit
+    - Bước 4: Chuẩn hóa phổ CMVN (Mean-Variance Normalization) khử méo micro
+    =============================================================================
     """
     def __init__(self, sample_rate=16000, n_fft=512, win_length=400, hop_length=160, n_mels=80):
-        self.sample_rate = sample_rate
-        self.n_fft = n_fft
-        self.win_length = win_length
-        self.hop_length = hop_length
-        self.n_mels = n_mels
+        # [MỤC 2.4 - TV1] Tham số DSP chuẩn đồ án:
+        self.sample_rate = sample_rate  # 16.000 Hz
+        self.n_fft = n_fft              # 512 điểm FFT (257 bins tần số)
+        self.win_length = win_length    # 400 mẫu = 25ms (tín hiệu giả dừng)
+        self.hop_length = hop_length    # 160 mẫu = 10ms (độ chồng lấn overlap 60%)
+        self.n_mels = n_mels            # 80 dải lọc Mel phi tuyến tính
 
-        # Khởi tạo ma trận bộ lọc Mel (Mel Filter Bank - Slide 01c)
+        # [MỤC 2.4 - TV1] Khởi tạo ma trận 80 bộ lọc Mel mô phỏng ốc tai
         mel_fb = librosa.filters.mel(sr=sample_rate, n_fft=n_fft, n_mels=n_mels)
         self.mel_basis = torch.from_numpy(mel_fb).float()
-        # Cửa sổ Hamming (Hamming Window - Slide 01c)
+        # [MỤC 2.4 - TV1] Cửa sổ Hamming w[n] giảm búp phụ -43 dB, chống rò rỉ phổ (Spectral leakage)
         self.window = torch.hamming_window(win_length)
 
     def extract(self, audio_np):
-        """Trích xuất Log Mel-Spectrogram từ mảng numpy âm thanh 16kHz."""
+        """
+        [MỤC 2.4 - TV1] Trích xuất Log Mel-Spectrogram từ mảng âm thanh 16kHz
+        Đầu vào: Mảng audio float32 biên độ [-1.0, 1.0]
+        Đầu ra: Tensor đặc trưng (n_mels=80, Time) đã chuẩn hóa CMVN
+        """
         if isinstance(audio_np, np.ndarray):
             y = torch.from_numpy(audio_np).float()
         else:
             y = audio_np.float()
 
-        # STFT với cửa sổ Hamming
+        # [MỤC 2.4 - TV1] Bước 1 & 2: STFT với cửa sổ Hamming -> Phổ công suất |STFT|^2
         stft = torch.stft(
             y,
             n_fft=self.n_fft,
@@ -48,25 +59,30 @@ class MelFeatureExtractor:
             window=self.window,
             return_complex=True
         )
-        # Năng lượng phổ (Power Spectrum = |STFT|^2)
-        power_spec = stft.abs().pow(2)
-        # Chiếu qua dải lọc Mel
-        mel_spec = torch.matmul(self.mel_basis, power_spec)
-        # Thang đo Logarit (Log Mel-Spectrogram)
+        power_spec = stft.abs().pow(2)  # (N_fft/2 + 1 = 257, Time)
+
+        # [MỤC 2.4 - TV1] Bước 3: Chiếu qua 80 dải lọc Mel & Nén Logarit theo luật Weber-Fechner
+        mel_spec = torch.matmul(self.mel_basis, power_spec)  # (80, Time)
         log_mel = torch.log(torch.clamp(mel_spec, min=1e-5))
 
-        # Chuẩn hóa Mean-Variance Normalization (CMVN)
+        # [MỤC 2.4 - TV1] Bước 4: Chuẩn hóa CMVN (Mean-Variance Normalization) khử méo kênh truyền / mic
         mean = log_mel.mean()
         std = log_mel.std() + 1e-6
         norm_mel = (log_mel - mean) / std
 
-        return norm_mel  # (n_mels, Time)
+        return norm_mel  # (n_mels=80, Time)
 
 
 class VIVOSDataset(Dataset):
     """
-    PyTorch Dataset cho tập dữ liệu VIVOS Tiếng Việt.
-    Đọc các file âm thanh .wav và các câu nhãn văn bản từ prompts.txt.
+    =============================================================================
+    [MỤC 2.2 - TV1: TRẦN ĐĂNG THẮNG]
+    CẤU TRÚC DỮ LIỆU TẬP NGỮ LIỆU TIẾNG VIỆT VIVOS:
+    - Tổng thời lượng: 15.4 giờ, 12.488 câu
+    - Train set: 11.660 câu (46 người nói nam/nữ đa vùng miền)
+    - Test set: 828 câu (19 người nói hoàn toàn độc lập - Speaker-Independent)
+    - Định dạng: WAV 16kHz, 16-bit Mono Linear PCM, nhãn trong prompts.txt
+    =============================================================================
     """
     def __init__(self, vivos_dir, split="train", vocab=None, max_duration=12.0, min_duration=0.5):
         self.vivos_dir = vivos_dir
@@ -134,6 +150,81 @@ class VIVOSDataset(Dataset):
 
         item = (mel, label_indices, text)
         if len(self.cache) < 3000:
+            self.cache[idx] = item
+
+        return item
+
+
+class CommonVoiceDataset(Dataset):
+    """
+    =============================================================================
+    [MỞ RỘNG MIỀN DỮ LIỆU - TV1: TRẦN ĐĂNG THẮNG]
+    BỘ DỮ LIỆU MOZILLA COMMON VOICE TIẾNG VIỆT CHUẨN 16KHZ MONO (1.000 MẪU)
+    - Âm thanh thu thập từ cộng đồng đa dạng chất giọng, môi trường và micro
+    - Phục vụ Huấn luyện mở rộng miền (Domain Adaptation) cho Dual-Attention ACRNN
+    - Bằng chứng học thuật về năng lực tổng quát hóa đa tập dữ liệu
+    =============================================================================
+    """
+    def __init__(self, cv_dir=None, vocab=None):
+        if cv_dir is None:
+            base_project = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+            cv_dir = os.path.join(base_project, "dataset", "common_voice_vi")
+        self.cv_dir = cv_dir
+        self.vocab = vocab
+        self.extractor = MelFeatureExtractor()
+
+        prompts_file = os.path.join(cv_dir, "prompts.txt")
+        waves_dir = os.path.join(cv_dir, "waves")
+
+        if not os.path.exists(prompts_file):
+            raise FileNotFoundError(f"Không tìm thấy file nhãn Common Voice: {prompts_file}")
+
+        self.samples = []
+        with open(prompts_file, "r", encoding="utf-8") as f:
+            for line in f:
+                line = line.strip()
+                if not line:
+                    continue
+                parts = line.split(maxsplit=1)
+                if len(parts) == 2:
+                    utt_id, text = parts[0], parts[1]
+                else:
+                    utt_id, text = parts[0], ""
+
+                wav_path = os.path.join(waves_dir, f"{utt_id}.wav")
+                if os.path.exists(wav_path):
+                    self.samples.append((wav_path, text.strip()))
+
+        self.cache = {}
+        print(f"[CommonVoiceDataset] Đã nạp thành công {len(self.samples)} mẫu câu Mozilla Common Voice hợp lệ.")
+
+    def __len__(self):
+        return len(self.samples)
+
+    def __getitem__(self, idx):
+        if idx in self.cache:
+            return self.cache[idx]
+
+        wav_path, text = self.samples[idx]
+        try:
+            audio, sr = sf.read(wav_path)
+            if audio.ndim > 1:
+                audio = np.mean(audio, axis=1)
+            mel = self.extractor.extract(audio)
+        except Exception as e:
+            mel = torch.zeros(80, 100)
+
+        if self.vocab is not None:
+            label_indices = self.vocab.text_to_indices(text)
+        else:
+            label_indices = []
+
+        ctc_time_frames = mel.size(1) // 4
+        if len(label_indices) > ctc_time_frames and ctc_time_frames > 0:
+            label_indices = label_indices[:ctc_time_frames]
+
+        item = (mel, label_indices, text)
+        if len(self.cache) < 2000:
             self.cache[idx] = item
 
         return item
