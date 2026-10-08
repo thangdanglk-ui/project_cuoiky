@@ -56,11 +56,8 @@ def train_joint_all(epochs=10, batch_size=32, lr=1e-4, max_vivos_samples=None, d
     if not os.path.exists(cv_dir):
         raise FileNotFoundError(f"Không tìm thấy thư mục {cv_dir}!")
     
-    cv_dataset = CommonVoiceDataset(cv_dir=cv_dir, vocab=vocab)
-    test_cv_size = min(100, len(cv_dataset))
-    train_cv_size = len(cv_dataset) - test_cv_size
-    cv_train = Subset(cv_dataset, list(range(train_cv_size)))
-    cv_test = Subset(cv_dataset, list(range(train_cv_size, len(cv_dataset))))
+    cv_train = CommonVoiceDataset(cv_dir=cv_dir, split="train", vocab=vocab)
+    cv_test = CommonVoiceDataset(cv_dir=cv_dir, split="test", vocab=vocab)
     print(f"[1/4] Đã nạp Common Voice: {len(cv_train)} câu Train | {len(cv_test)} câu Validation")
 
     # 2. Nạp tập VIVOS
