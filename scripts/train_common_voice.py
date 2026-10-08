@@ -42,18 +42,9 @@ def train_common_voice(epochs=1, batch_size=16, lr=5e-5, mix_vivos=True, max_hou
     print(f" Cấu hình: Epochs={epochs}, BatchSize={batch_size}, LR={lr}, MaxHours={max_hours}h")
     print("=" * 75)
 
-    # 1. Nạp tập dữ liệu Common Voice
-    cv_dataset = CommonVoiceDataset(vocab=vocab)
-    
-    # 2. Chuẩn bị tập Train & Test
-    # Lấy 100 mẫu làm Test đánh giá miền mới (In-domain Validation)
-    test_size = 100
-    train_size = len(cv_dataset) - test_size
-    train_indices = list(range(train_size))
-    test_indices = list(range(train_size, len(cv_dataset)))
-    
-    cv_train = Subset(cv_dataset, train_indices)
-    cv_test = Subset(cv_dataset, test_indices)
+    # 1. Nạp tập dữ liệu Common Voice đã được phân tách chuẩn mực
+    cv_train = CommonVoiceDataset(split="train", vocab=vocab)
+    cv_test = CommonVoiceDataset(split="test", vocab=vocab)
 
     if mix_vivos:
         vivos_dir = os.path.join(BASE_DIR, "dataset", "vivos")

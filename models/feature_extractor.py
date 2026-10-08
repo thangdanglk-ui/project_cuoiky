@@ -165,16 +165,23 @@ class CommonVoiceDataset(Dataset):
     - Bằng chứng học thuật về năng lực tổng quát hóa đa tập dữ liệu
     =============================================================================
     """
-    def __init__(self, cv_dir=None, vocab=None):
+    def __init__(self, cv_dir=None, split="train", vocab=None):
         if cv_dir is None:
             base_project = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
             cv_dir = os.path.join(base_project, "dataset", "common_voice_vi")
         self.cv_dir = cv_dir
+        self.split = split
         self.vocab = vocab
         self.extractor = MelFeatureExtractor()
 
-        prompts_file = os.path.join(cv_dir, "prompts.txt")
-        waves_dir = os.path.join(cv_dir, "waves")
+        # Hỗ trợ cả cấu trúc phân tách train/test chuẩn VIVOS lẫn cấu trúc phẳng
+        split_dir = os.path.join(cv_dir, split)
+        if os.path.exists(split_dir):
+            prompts_file = os.path.join(split_dir, "prompts.txt")
+            waves_dir = os.path.join(split_dir, "waves")
+        else:
+            prompts_file = os.path.join(cv_dir, "prompts.txt")
+            waves_dir = os.path.join(cv_dir, "waves")
 
         if not os.path.exists(prompts_file):
             raise FileNotFoundError(f"Không tìm thấy file nhãn Common Voice: {prompts_file}")
@@ -196,7 +203,7 @@ class CommonVoiceDataset(Dataset):
                     self.samples.append((wav_path, text.strip()))
 
         self.cache = {}
-        print(f"[CommonVoiceDataset] Đã nạp thành công {len(self.samples)} mẫu câu Mozilla Common Voice hợp lệ.")
+        print(f"[CommonVoiceDataset] Đã nạp thành công tập '{split}': {len(self.samples)} mẫu câu Mozilla Common Voice hợp lệ.")
 
     def __len__(self):
         return len(self.samples)
