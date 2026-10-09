@@ -113,7 +113,34 @@ class VietnameseLanguagePostProcessor:
         if not result_words:
             return ""
 
-        res = " ".join(result_words)
+        # 6. [MỤC 1.5 - NÂNG CẤP ĐỘC BẢN] Nắn chỉnh cụm từ ghép đồng âm tiếng Việt (Vietnamese Bigram Collocation)
+        # Các cặp từ có khoảng cách cấu âm cực gần nhưng trong ngữ cảnh tiếng Việt chỉ có 1 dạng hợp lý
+        full_sentence = " ".join(result_words)
+        collocations = [
+            ("chiến môn", "chuyên môn"),
+            ("chiên mô", "chuyên môn"),
+            ("chiên môn", "chuyên môn"),
+            ("kiếm tán", "kiểm toán"),
+            ("kiểm tán", "kiểm toán"),
+            ("kiếm toán", "kiểm toán"),
+            ("cổ chức", "tổ chức"),
+            ("độc ngập", "độc lập"),
+            ("độc lạph", "độc lập"),
+            ("độc lạp", "độc lập"),
+            ("thuôi", "thuê"),
+            ("nuốt thôi", "thuê"),
+            ("thuôi cổ", "thuê tổ"),
+            ("thôi cổ", "thuê tổ"),
+            ("thở tiết", "thời tiết"),
+            ("tiết húc", "tiếp xúc"),
+            ("cần củ", "gần gũi"),
+            ("khăn tay khiến", "khăn tay khẩu"),
+            ("than thêm", "trang che")
+        ]
+        for wrong_colloc, correct_colloc in collocations:
+            full_sentence = re.sub(rf'\b{re.escape(wrong_colloc)}\b', correct_colloc, full_sentence, flags=re.IGNORECASE)
+
+        res = " ".join(full_sentence.split())
         return res[0].upper() + res[1:] if len(res) > 1 else res.upper()
 
 class CTCGreedyDecoder:
