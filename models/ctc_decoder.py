@@ -53,19 +53,24 @@ class VietnameseLanguagePostProcessor:
         if not tokens:
             return ""
 
+        vowels = set("aàáảãạăằắẳẵặâầấẩẫậeèéẻẽẹêềếểễệiìíỉĩịoòóỏõọôồốổỗộơờớởỡợuùúủũụưừứửữựyỳýỷỹỵ")
         result_words = []
         prev_word = None
 
         for t in tokens:
-            # Bỏ qua các ký tự đơn lẻ vô nghĩa (nhiễu âm thanh/tiếng thở)
-            if len(t) == 1 and t not in {'ở', 'ạ', 'à', 'ừ', 'ê', 'y', 'ô', 'a', 'ơi'}:
+            # 1. Bỏ qua các ký tự đơn lẻ vô nghĩa (trừ nguyên âm độc lập có nghĩa)
+            if len(t) == 1 and t not in {'ở', 'ạ', 'à', 'ừ', 'ê', 'y', 'ô', 'a', 'ơi', 'ý'}:
                 continue
 
-            # 1. Nếu token đã là từ vựng tiếng Việt hợp lệ, giữ nguyên
+            # 2. Bỏ qua các chuỗi phụ âm không có nguyên âm (nhiễu tiếng thở / tặc lưỡi / mic rè như 'tr', 'th', 'r')
+            if not any(ch in vowels for ch in t):
+                continue
+
+            # 3. Nếu token đã là từ vựng tiếng Việt hợp lệ trong từ điển, giữ nguyên
             if t in self.all_words:
                 chosen = t
             elif len(t) >= 2:
-                # 2. Ánh xạ khung phụ âm chỉ khi từ có độ dài từ 2 ký tự trở lên
+                # 4. Tìm kiếm từ hợp lệ gần nhất trong từ điển
                 c = self._get_consonants(t)
                 candidates = self.cons_map.get(c, [])
                 if not candidates:
@@ -76,13 +81,31 @@ class VietnameseLanguagePostProcessor:
                             break
 
                 if candidates:
-                    chosen = candidates[0]
+                    # Chọn ứng viên có độ dài tương đồng và chia sẻ nguyên âm
+                    t_vowels = set(ch for ch in t if ch in vowels)
+                    best_cand = None
+                    best_score = -1
+
+                    for cand in candidates:
+                        cand_vowels = set(ch for ch in cand if ch in vowels)
+                        common_vowels = len(t_vowels.intersection(cand_vowels))
+                        len_diff = abs(len(cand) - len(t))
+                        score = common_vowels * 2 - len_diff
+                        if score > best_score:
+                            best_score = score
+                            best_cand = cand
+
+                    # Chỉ thay thế nếu ứng viên có độ tương đồng hợp lý, ngược lại giữ nguyên âm gốc
+                    if best_cand and best_score >= 0:
+                        chosen = best_cand
+                    else:
+                        chosen = t
                 else:
                     chosen = t
             else:
                 chosen = t
 
-            # 3. Khử lặp từ liên tiếp
+            # 5. Khử lặp từ liên tiếp do kéo dài âm CTC
             if chosen != prev_word:
                 result_words.append(chosen)
                 prev_word = chosen
@@ -175,8 +198,8 @@ class CTCGreedyDecoder:
         if blank_penalty != 0:
             adjusted[:, self.blank_id] -= blank_penalty
 
-        best_ids = torch.argmax(adjusted, dim=-1).cpu().numpy().tolist()
-        entropy_vals = entropy.cpu().numpy().tolist()
+        best_ids = torch.argmax(adjusted, dim=-1).detach().cpu().numpy().tolist()
+        entropy_vals = entropy.detach().cpu().numpy().tolist()
 
         # Co CTC: giữ lại token và độ entropy tương ứng
         collapsed_tokens = []
