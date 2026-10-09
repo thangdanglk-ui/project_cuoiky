@@ -261,7 +261,7 @@ if __name__ == "__main__":
     parser.add_argument("--samples", type=int, default=1500, help="Số mẫu huấn luyện tối đa")
     parser.add_argument("--lr", type=float, default=1e-4, help="Learning rate (nhỏ cho fine-tuning)")
     parser.add_argument("--hours", type=float, default=2.0, help="Thời gian chạy tối đa (giờ)")
-    parser.add_argument("--device", type=str, default=None, help="Thiết bị huấn luyện: cuda hoặc cpu")
+    parser.add_argument("--device", type=str, default="cpu", help="Thiết bị tính toán: 'cuda' hoặc 'cpu'")
     parser.add_argument("--no_resume", action="store_true", help="Không nạp lại checkpoint cũ mà train từ đầu")
     args = parser.parse_args()
 
