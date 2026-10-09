@@ -36,8 +36,7 @@ def train_joint_all(epochs=10, batch_size=32, lr=1e-4, max_vivos_samples=None, d
     weights_dir = os.path.join(BASE_DIR, "models", "weights")
     os.makedirs(weights_dir, exist_ok=True)
     vocab_path = os.path.join(weights_dir, "vocab.json")
-    model_save_path = os.path.join(weights_dir, "vivos_commonvoice_acrnn.pth")
-    base_model_path = os.path.join(weights_dir, "vivos_ctc_model.pth")
+    model_save_path = os.path.join(weights_dir, "vivos_ctc_model.pth")
 
     vocab = VietnameseVocab()
     if not os.path.exists(vocab_path):
@@ -218,8 +217,7 @@ def train_joint_all(epochs=10, batch_size=32, lr=1e-4, max_vivos_samples=None, d
             "base_model": "Dual-Attention ACRNN"
         }
         torch.save(ckpt, model_save_path)
-        torch.save(ckpt, base_model_path)
-        print(f"[LƯU TRỮ] Đã đồng bộ trọng số vào {model_save_path} và {base_model_path}\n", flush=True)
+        print(f"[LƯU TRỮ] Đã lưu trọng số vào {model_save_path}\n", flush=True)
 
         history["epochs"].append(epoch)
         history["train_loss"].append(round(avg_train_loss, 4))

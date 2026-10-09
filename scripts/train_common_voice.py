@@ -33,7 +33,6 @@ def train_common_voice(epochs=1, batch_size=16, lr=5e-5, mix_vivos=True, max_hou
     os.makedirs(weights_dir, exist_ok=True)
     vocab_path = os.path.join(weights_dir, "vocab.json")
     base_model_path = os.path.join(weights_dir, "vivos_ctc_model.pth")
-    adapted_model_path = os.path.join(weights_dir, "vivos_commonvoice_acrnn.pth")
 
     vocab = VietnameseVocab()
     print("=" * 75)
@@ -168,11 +167,8 @@ def train_common_voice(epochs=1, batch_size=16, lr=5e-5, mix_vivos=True, max_hou
         "val_loss": avg_val_loss,
         "base_model": "Dual-Attention ACRNN"
     }
-    torch.save(ckpt_save, adapted_model_path)
-    # Đồng thời cập nhật checkpoint chính vivos_ctc_model.pth để ứng dụng web và controller dùng ngay
     torch.save(ckpt_save, base_model_path)
-    print(f"\n[LƯU TRỮ] Đã lưu mô hình thích ứng đa miền vào: {adapted_model_path}", flush=True)
-    print(f"[ĐỒNG BỘ] Đã đồng bộ vào checkpoint chính: {base_model_path}", flush=True)
+    print(f"\n[LƯU TRỮ] Đã lưu mô hình vào: {base_model_path}", flush=True)
     print("=" * 75)
     print("HOÀN TẤT HUẤN LUYỆN MỞ RỘNG TRÊN MOZILLA COMMON VOICE!")
     print("=" * 75)

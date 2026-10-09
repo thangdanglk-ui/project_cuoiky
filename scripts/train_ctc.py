@@ -32,7 +32,6 @@ def train_ctc(epochs=30, batch_size=16, lr=1e-4, max_train_samples=3000, device=
     os.makedirs(weights_dir, exist_ok=True)
     vocab_path = os.path.join(weights_dir, "vocab.json")
     model_save_path = os.path.join(weights_dir, "vivos_ctc_model.pth")
-    backup_path = os.path.join(weights_dir, "vivos_ctc_model_epoch15_original.pth")
 
     print("=" * 75)
     print(" TIẾP TỤC HUẤN LUYỆN (RESUME TRAINING) MÔ HÌNH CRNN-CTC TIẾNG VIỆT")
