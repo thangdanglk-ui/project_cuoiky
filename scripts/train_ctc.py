@@ -250,7 +250,6 @@ def train_ctc(epochs=30, batch_size=16, lr=1e-4, max_train_samples=3000, device=
     print("\n" + "=" * 75)
     print(f"HOÀN TẤT ĐỢT HUẤN LUYỆN! Tổng thời gian chạy: {total_training_time/3600:.2f} giờ ({total_training_time/60:.1f} phút)")
     print(f"Trọng số tối ưu đã được lưu tại: {model_save_path}")
-    print(f"Bản sao lưu ban đầu (Epoch 15) vẫn an toàn tại: {backup_path}")
     print("=" * 75)
     return model_save_path
 
