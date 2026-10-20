@@ -43,3 +43,5 @@ scratch/
 *.parquet
 models/weights/*baseline*.pth
 models/weights/*epoch*.pth
+
+scratch_backup/
