@@ -23,10 +23,19 @@ from models.feature_extractor import VIVOSDataset, ctc_collate_fn
 from models.ctc_decoder import CTCGreedyDecoder
 
 def train_ctc(epochs=30, batch_size=16, lr=1e-4, max_train_samples=3000, device=None, resume=True, max_hours=2.0):
-    if device is None:
+    if device == "cuda" and not torch.cuda.is_available():
+        print("\n" + "!" * 75)
+        print("[CẢNH BÁO] Bạn đã truyền '--device cuda' nhưng môi trường Colab hiện tại CHƯA BẬT GPU!")
+        print("👉 Hướng dẫn bật GPU tăng tốc:")
+        print("   Vào menu: Thời gian chạy (Runtime) -> Thay đổi loại thời gian chạy (Change runtime type) -> Chọn T4 GPU -> Lưu.")
+        print("Tạm thời hệ thống tự động chuyển sang CPU để chạy tiếp.")
+        print("!" * 75 + "\n")
+        device = "cpu"
+    elif device is None:
         device = "cuda" if torch.cuda.is_available() else "cpu"
+
     if device == "cpu":
-        torch.set_num_threads(2)
+        torch.set_num_threads(os.cpu_count() or 2)
 
     weights_dir = os.path.join(BASE_DIR, "models", "weights")
     os.makedirs(weights_dir, exist_ok=True)
