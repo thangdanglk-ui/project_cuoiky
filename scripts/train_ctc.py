@@ -124,6 +124,9 @@ def train_ctc(epochs=30, batch_size=16, lr=1e-4, max_train_samples=3000, device=
     print(f"[Thời gian] Giới hạn thời gian tối đa: {max_hours:.1f} giờ ({max_seconds/60:.0f} phút)\n")
 
     # 6. Vòng lặp huấn luyện chính
+    history_epochs = []
+    history_train_loss = []
+    history_val_loss = []
     stopped_by_time = False
     for epoch in range(start_epoch, end_epoch + 1):
         epoch_start_time = time.time()
@@ -212,13 +215,20 @@ def train_ctc(epochs=30, batch_size=16, lr=1e-4, max_train_samples=3000, device=
         avg_val_loss = total_val_loss / max(1, len(val_loader))
         scheduler.step(avg_val_loss)
 
+        history_epochs.append(epoch)
+        history_train_loss.append(round(avg_train_loss, 4))
+        history_val_loss.append(round(avg_val_loss, 4))
+
         epoch_duration = time.time() - epoch_start_time
         total_elapsed = time.time() - global_start_time
-        print(f"\n[KẾT QUẢ] EPOCH {epoch}:", flush=True)
-        print(f"   Train CTC Loss: {avg_train_loss:.4f} | Val CTC Loss: {avg_val_loss:.4f} (Kỷ lục cũ: {best_val_loss:.4f})", flush=True)
-        print(f"   Thời gian Epoch: {epoch_duration:.1f}s | Tổng thời gian: {total_elapsed/60:.1f} phút", flush=True)
-        print(f"   - Mẫu Nhãn Gốc:  '{sample_true_text}'", flush=True)
-        print(f"   - Mẫu AI Đoán:   '{sample_pred_text}'", flush=True)
+        print("\n" + "=" * 70, flush=True)
+        print(f"⭐ [KẾT QUẢ TIẾN TRÌNH NHẬN DẠNG EPOCH {epoch}/{end_epoch}]:", flush=True)
+        print(f"   • Train CTC Loss: {avg_train_loss:.4f} | Val CTC Loss: {avg_val_loss:.4f} (Kỷ lục: {best_val_loss:.4f})", flush=True)
+        print(f"   • Thời gian Epoch: {epoch_duration:.1f}s | Tổng thời gian: {total_elapsed/60:.1f} phút", flush=True)
+        print(f"   " + "-" * 66, flush=True)
+        print(f"   🎯 Câu Mẫu Gốc (Ground Truth) : '{sample_true_text}'", flush=True)
+        print(f"   🤖 AI Nhận Dạng (Epoch {epoch:02d})     : '{sample_pred_text}'", flush=True)
+        print("=" * 70, flush=True)
 
         # Lưu checkpoint khi có cải thiện hoặc kết thúc epoch
         is_best = avg_val_loss < best_val_loss
@@ -251,6 +261,26 @@ def train_ctc(epochs=30, batch_size=16, lr=1e-4, max_train_samples=3000, device=
     print(f"HOÀN TẤT ĐỢT HUẤN LUYỆN! Tổng thời gian chạy: {total_training_time/3600:.2f} giờ ({total_training_time/60:.1f} phút)")
     print(f"Trọng số tối ưu đã được lưu tại: {model_save_path}")
     print("=" * 75)
+
+    if len(history_epochs) > 0:
+        try:
+            import matplotlib.pyplot as plt
+            chart_path = os.path.join(weights_dir, "loss_overfitting_chart.png")
+            plt.figure(figsize=(9, 5))
+            plt.plot(history_epochs, history_train_loss, "b-o", label="Train Loss (Huấn luyện)", linewidth=2)
+            plt.plot(history_epochs, history_val_loss, "r-s", label="Validation Loss (Kiểm thử)", linewidth=2)
+            plt.title("ĐỒ THỊ HÀM MẤT MÁT CTC LOSS QUA CÁC EPOCHS (VIVOS)", fontsize=13, fontweight="bold")
+            plt.xlabel("Epoch", fontsize=11)
+            plt.ylabel("CTC Loss", fontsize=11)
+            plt.grid(True, linestyle="--", alpha=0.6)
+            plt.legend(fontsize=11)
+            plt.tight_layout()
+            plt.savefig(chart_path, dpi=200)
+            plt.close()
+            print(f"[ĐỒ THỊ] Đã lưu biểu đồ Loss vào: {chart_path}", flush=True)
+        except Exception as e:
+            print(f"[Cảnh báo] Không thể vẽ biểu đồ: {e}", flush=True)
+
     return model_save_path
 
 if __name__ == "__main__":
